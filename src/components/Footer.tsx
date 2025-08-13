@@ -10,7 +10,7 @@ export const Footer = () => {
   ];
 
   const handleWhatsAppClick = () => {
-    window.open("https://wa.me/7028661826", "_blank");
+    window.open("https://wa.me/8087252297", "_blank");
   };
 
   return (
