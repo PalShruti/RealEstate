@@ -10,7 +10,7 @@ export const Footer = () => {
   ];
 
   const handleWhatsAppClick = () => {
-    window.open("https://wa.me/+91 8087252297", "_blank");
+    window.open("https://wa.me/+918087252297", "_blank");
   };
 
   return (
@@ -65,7 +65,7 @@ export const Footer = () => {
               className="bg-green-600 hover:bg-green-700 text-white w-full max-w-xs mb-4 flex items-center justify-center space-x-2"
             >
               <MessageCircle className="w-5 h-5" />
-              <span>Chat on WhatsApp</span>
+              <span>Chat on </span>
             </Button>
             <p className="text-sm text-gray-500 text-center">
               Available 24/7 for your queries
