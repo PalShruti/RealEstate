@@ -49,7 +49,12 @@ export const Footer = () => {
               <li>📍 097/2/C, PLOT NO. 8.9.10, A WARD, MATOSHRI<br />PRAMILA SARNAIK PARK,
                 SANE GURUJI VASAHAT, NEAR DESHMUKH HIGH SCHOOL, KOLHAPUR – 416012</li>
               <li>📞 +91 8087252297</li>
-              <li>✉️ info@laureltechnologies.in</li>
+              <li>✉️ {" "}
+                <a href="mailto:info@laureltechnologies.in"
+                className="hover:underline ">
+                  info@laureltechnologies.in
+                  </a>
+              </li>
               <li>🕒 Mon-Fri: 9:00 AM - 7:00 PM</li>
             </ul>
           </div>
