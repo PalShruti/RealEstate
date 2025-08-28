@@ -1,58 +1,67 @@
-// src/server.ts
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import { bungalowsService } from "./src/services/bungalowsService";
+// src/services/bungalowsService.ts
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+dotenv.config();
+// ✅ Supabase client initialization
+const supabase = createClient(
+  process.env.SUPABASE_URL as string,
+  process.env.SUPABASE_ANON_KEY as string
+);
 
-const app = express();
-const PORT = 5000;
+export interface Bungalow {
+  id?: string;
+  plot_number: string;
+  type: string;
+  size_sqft: number;
+  price: number;
+  status: "Available" | "Booked" | "Sold";
+  created_at?: string;
+}
 
-app.use(cors());
-app.use(bodyParser.json());
+export const bungalowsService = {
+  // ✅ Get all bungalows
+  async getAllBungalows(): Promise<Bungalow[]> {
+    const { data, error } = await supabase
+      .from("bungalows")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-// Routes
+    if (error) throw error;
+    return data as Bungalow[];
+  },
 
-// Get all bungalows
-app.get("/api/bungalows", async (req, res) => {
-  try {
-    const data = await bungalowsService.getAllBungalows();
-    res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+  // ✅ Add a new bungalow
+  async addBungalow(bungalow: Bungalow): Promise<Bungalow> {
+    const { data, error } = await supabase
+      .from("bungalows")
+      .insert([bungalow])
+      .select()
+      .single();
 
-// Add new bungalow
-app.post("/api/bungalows", async (req, res) => {
-  try {
-    const data = await bungalowsService.addBungalow(req.body);
-    res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    if (error) throw error;
+    return data as Bungalow;
+  },
 
-// Update bungalow
-app.put("/api/bungalows/:id", async (req, res) => {
-  try {
-    const data = await bungalowsService.updateBungalow(req.params.id, req.body);
-    res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+  // ✅ Update bungalow by ID
+  async updateBungalow(id: string, bungalow: Partial<Bungalow>): Promise<Bungalow> {
+    const { data, error } = await supabase
+      .from("bungalows")
+      .update(bungalow)
+      .eq("id", id)
+      .select()
+      .single();
 
-// Delete bungalow
-app.delete("/api/bungalows/:id", async (req, res) => {
-  try {
-    await bungalowsService.deleteBungalow(req.params.id);
-    res.json({ success: true });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    if (error) throw error;
+    return data as Bungalow;
+  },
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+  // ✅ Delete bungalow by ID
+  async deleteBungalow(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("bungalows")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+  },
+};
