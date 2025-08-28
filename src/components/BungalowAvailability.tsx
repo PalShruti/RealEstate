@@ -1,28 +1,48 @@
+// src/components/BungalowAvailability.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface Bungalow {
-  id: number;
-  plot_number: string;
-  bungalow_type: string;
-  size_sqft: number;
-  price: number;
-  status: "Available" | "Booked";
-}
+import { bungalowsService, type Bungalow } from "@/services/bungalowsService";
 
 const BungalowAvailability: React.FC = () => {
   const [bungalows, setBungalows] = useState<Bungalow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/bungalows")
-      .then((res) => res.json())
-      .then((data) => setBungalows(data));
+    const load = async () => {
+      try {
+        const data = await bungalowsService.getAllBungalows();
+        setBungalows(data);
+      } catch (err: any) {
+        console.error("Failed to fetch bungalows:", err);
+        setError(err?.message ?? "Failed to fetch bungalows");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const handleBookVisit = () => {
-  navigate("/procurement#book-visit");
-};
+    navigate("/procurement#book-visit");
+  };
+
+  if (loading) {
+    return (
+      <div className="mt-8 p-6 bg-white shadow rounded">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-8 p-6 bg-white shadow rounded text-red-600">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8 p-6 bg-white shadow rounded">
@@ -42,16 +62,20 @@ const BungalowAvailability: React.FC = () => {
             <tr
               key={b.id}
               onClick={b.status === "Available" ? handleBookVisit : undefined}
-              className={`${
-                b.status === "Booked"
-                  ? "bg-gray-200 cursor-not-allowed"
-                  : "hover:bg-green-50 cursor-pointer"
-              }`}
+              className={
+                b.status === "Available"
+                  ? "hover:bg-green-50 cursor-pointer"
+                  : "bg-gray-200 cursor-not-allowed"
+              }
             >
               <td className="border p-2">{b.plot_number}</td>
-              <td className="border p-2">{b.bungalow_type}</td>
-              <td className="border p-2">{b.size_sqft}</td>
-              <td className="border p-2">₹{b.price}</td>
+              <td className="border p-2">{b.type}</td>
+              <td className="border p-2">
+                {b.size_sqft?.toLocaleString?.("en-IN") ?? b.size_sqft}
+              </td>
+              <td className="border p-2">
+                ₹{b.price?.toLocaleString?.("en-IN") ?? b.price}
+              </td>
               <td
                 className={`border p-2 font-semibold ${
                   b.status === "Available" ? "text-green-600" : "text-red-500"
@@ -63,6 +87,12 @@ const BungalowAvailability: React.FC = () => {
           ))}
         </tbody>
       </table>
+
+      {bungalows.length === 0 && (
+        <div className="text-sm text-gray-500 mt-3">
+          No bungalows found.
+        </div>
+      )}
     </div>
   );
 };
