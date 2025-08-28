@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   const socialLinks = [
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Twitter, href: "#", label: "Twitter" },
+    // { icon: Facebook, href: "https://www.facebook.com/YourPage", label: "Facebook" },
+    // { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram" }
   ];
 
   const handleWhatsAppClick = () => {
@@ -17,6 +15,7 @@ export const Footer = () => {
     <footer className="bg-gray-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center text-center">
+
           {/* Company Info */}
           <div className="flex flex-col items-center">
             <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -32,6 +31,8 @@ export const Footer = () => {
                   <a
                     key={index}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="bg-gray-800 p-2 rounded-full hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-110"
                     aria-label={social.label}
                   >
@@ -50,10 +51,9 @@ export const Footer = () => {
                 SANE GURUJI VASAHAT, NEAR DESHMUKH HIGH SCHOOL, KOLHAPUR – 416012</li>
               <li>📞 +91 8087252297</li>
               <li>✉️ {" "}
-                <a href="mailto:info@laureltechnologies.in"
-                className="hover:underline ">
+                <a href="mailto:info@laureltechnologies.in" className="hover:underline">
                   info@laureltechnologies.in
-                  </a>
+                </a>
               </li>
               <li>🕒 Mon-Fri: 9:00 AM - 7:00 PM</li>
             </ul>
@@ -70,14 +70,14 @@ export const Footer = () => {
               className="bg-green-600 hover:bg-green-700 text-white w-full max-w-xs mb-4 flex items-center justify-center space-x-2"
             >
               <MessageCircle className="w-5 h-5" />
-              <span>Chat on </span>
+              <span>Chat on WhatsApp</span>
             </Button>
             <p className="text-sm text-gray-500 text-center">
               Available 24/7 for your queries
             </p>
           </div>
-        </div>
 
+        </div>
       </div>
     </footer>
   );

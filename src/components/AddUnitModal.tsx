@@ -149,7 +149,7 @@ export const AddUnitModal = ({ isOpen, onClose, onSuccess }: AddUnitModalProps) 
                 <SelectItem value="1 BHK">1 BHK</SelectItem>
                 <SelectItem value="2 BHK">2 BHK</SelectItem>
                 <SelectItem value="3 BHK">3 BHK</SelectItem>
-                <SelectItem value="4 BHK">4 BHK</SelectItem>
+   
               </SelectContent>
             </Select>
           </div>

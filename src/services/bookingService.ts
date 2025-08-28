@@ -16,6 +16,7 @@ export const bookingService = {
     if (error) throw error;
     return data;
   },
+  
 
   // Create a new booking
   async createBooking(booking: BookingInsert) {
@@ -29,7 +30,7 @@ export const bookingService = {
     return data;
   },
 
-  // Update booking status
+  // Update status
   async updateBookingStatus(id: string, status: string) {
     const { data, error } = await supabase
       .from('bookings')

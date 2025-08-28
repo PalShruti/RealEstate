@@ -1,6 +1,9 @@
 
 -- Add bhk_type column to bookings table to store user preference
 ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS bhk_type TEXT;
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS property_type TEXT;
+
+
 
 -- Update the status column to have proper enum values
 ALTER TABLE public.bookings ALTER COLUMN status SET DEFAULT 'pending';

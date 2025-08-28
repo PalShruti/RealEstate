@@ -14,6 +14,7 @@ export const ProcurementPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     contact: "",
+    propertyType: "",
     bhkType: ""
   });
   const [errors, setErrors] = useState<{ name?: string }>({});
@@ -29,6 +30,7 @@ export const ProcurementPage = () => {
       setFormData({
         name: "",
         contact: "",
+        propertyType: "",
         bhkType: ""
       });
       toast({
@@ -55,6 +57,17 @@ export const ProcurementPage = () => {
     e.preventDefault();
 
     // Name validation
+    if (!formData.propertyType) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a property type",
+        variant: "destructive"
+      });
+      return;
+    }
+
+
+
     if (!formData.name.trim()) {
       setErrors({ name: "Please enter your name" });
       toast({
@@ -109,7 +122,8 @@ export const ProcurementPage = () => {
     createBookingMutation.mutate({
       name: formData.name.trim(),
       contact_number: formattedPhone,
-      bhk_type: formData.bhkType,
+      property_type: formData.propertyType ,
+      bhk_type: formData.bhkType ,
       status: 'pending'
     });
   };
@@ -142,7 +156,7 @@ export const ProcurementPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           <div className="bg-white rounded-2xl p-8 shadow-xl border border-blue-100">
             <h2 className="text-3xl font-bold text-blue-900 mb-8">Property Details</h2>
-            
+
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <div className="bg-blue-100 p-3 rounded-full">
@@ -177,7 +191,7 @@ export const ProcurementPage = () => {
 
           <div className="bg-white rounded-2xl p-8 shadow-xl border border-blue-100">
             <h2 className="text-3xl font-bold text-blue-900 mb-8">Amenities</h2>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-1 gap-6">
               {amenities.map((amenity, index) => {
                 const Icon = amenity.icon;
@@ -204,7 +218,7 @@ export const ProcurementPage = () => {
         <div className="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Experience Premium Living?</h2>
           <p className="text-xl mb-8 opacity-90">Book a personalized visit to explore your future home</p>
-          
+
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
               <Button
@@ -230,9 +244,8 @@ export const ProcurementPage = () => {
                       type="text"
                       required
                       placeholder="Enter your full name"
-                      className={`pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-200 ${
-                        errors.name ? "border-red-500" : ""
-                      }`}
+                      className={`pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-200 ${errors.name ? "border-red-500" : ""
+                        }`}
                       value={formData.name}
                       onChange={e => {
                         setFormData({ ...formData, name: e.target.value });
@@ -242,17 +255,17 @@ export const ProcurementPage = () => {
                           setErrors({ name: "Please enter name in characters only" });
                         }
                       }}
-                      
+
                     />
                     <p className="text-xs text-blue-600 mt-1">
-                    Only alphabets and spaces(no numbers or special characters)
-                  </p>
+                      Only alphabets and spaces(no numbers or special characters)
+                    </p>
                   </div>
                   {errors.name && (
                     <p className="text-xs text-red-500 mt-1">{errors.name}</p>
                   )}
                 </div>
-                
+
                 {/* Contact field */}
                 <div>
                   <Label htmlFor="contact" className="text-sm font-medium text-blue-800">Contact Number *</Label>
@@ -272,26 +285,59 @@ export const ProcurementPage = () => {
                     Format: +[country code][number] (no spaces or special characters)
                   </p>
                 </div>
-
-                {/* BHK Select */}
+                {/* Property Type Select */}
                 <div>
-                  <Label htmlFor="bhkType" className="text-sm font-medium text-blue-800">Preferred Configuration *</Label>
+                  <Label htmlFor="propertyType" className="text-sm font-medium text-blue-800">
+                    Property Type *
+                  </Label>
                   <Select
-                    onValueChange={value =>
-                      setFormData({ ...formData, bhkType: value })
-                    }
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, propertyType: value, bhkType: "" });
+                    }}
                   >
                     <SelectTrigger className="mt-1 border-blue-200 focus:border-blue-400">
-                      <SelectValue placeholder="Select BHK type" />
+                      <SelectValue placeholder="Select Property Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1 BHK">1 BHK</SelectItem>
-                      <SelectItem value="2 BHK">2 BHK</SelectItem>
-                      <SelectItem value="3 BHK">3 BHK</SelectItem>
+                      <SelectItem value="Flat">Flat</SelectItem>
+                      <SelectItem value="Bungalow">Bungalow</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
+                {/* Show BHK dropdown if Flat or Bungalow is selected */}
+{formData.propertyType && (
+  <div>
+    <Label htmlFor="bhkType" className="text-sm font-medium text-blue-800">
+      Preferred Configuration *
+    </Label>
+    <Select
+      onValueChange={(value) => setFormData({ ...formData, bhkType: value })}
+    >
+      <SelectTrigger className="mt-1 border-blue-200 focus:border-blue-400">
+        <SelectValue placeholder="Select BHK type" />
+      </SelectTrigger>
+      <SelectContent>
+        {formData.propertyType === "Flat" && (
+          <>
+            <SelectItem value="1 BHK">1 BHK</SelectItem>
+            <SelectItem value="2 BHK">2 BHK</SelectItem>
+            <SelectItem value="3 BHK">3 BHK</SelectItem>
+          </>
+        )}
+        {formData.propertyType === "Bungalow" && (
+          <>
+            <SelectItem value="1 BHK">2 BHK</SelectItem>
+            <SelectItem value="2 BHK">3 BHK</SelectItem>
+          </>
+        )}
+      </SelectContent>
+    </Select>
+  </div>
+)}
+
+
+                
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
@@ -303,6 +349,7 @@ export const ProcurementPage = () => {
             </DialogContent>
           </Dialog>
         </div>
+
 
         {/* Success Popup */}
         <Dialog open={showSuccessPopup} onOpenChange={setShowSuccessPopup}>
