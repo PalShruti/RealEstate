@@ -172,19 +172,40 @@ export const ProcurementPage = () => {
                 <div className="bg-blue-100 p-3 rounded-full">
                   <Home className="w-6 h-6 text-blue-600" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-blue-900">Configuration Options</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {["1 BHK", "2 BHK", "3 BHK"].map(config => (
-                      <span
-                        key={config}
-                        className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium border border-blue-200"
-                      >
-                        {config}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+               <div>
+  <h3 className="text-xl font-semibold text-blue-900">Configuration Options</h3>
+
+  {/* Flats in one line */}
+  <div className="flex items-center gap-3 mt-3">
+    <span className="text-lg font-medium text-blue-800">Flats</span>
+    <div className="flex gap-2">
+      {["1 BHK", "2 BHK", "3 BHK"].map(config => (
+        <span
+          key={config}
+          className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium border border-blue-200"
+        >
+          {config}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {/* Bungalows in one line */}
+  <div className="flex items-center gap-3 mt-3">
+    <span className="text-lg font-medium text-blue-800">Bungalows</span>
+    <div className="flex gap-2">
+      {["2 BHK", "3 BHK"].map(config => (
+        <span
+          key={config}
+          className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium border border-blue-200"
+        >
+          {config}
+        </span>
+      ))}
+    </div>
+  </div>
+</div>
+
               </div>
             </div>
           </div>
@@ -304,7 +325,6 @@ export const ProcurementPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
                 {/* Show BHK dropdown if Flat or Bungalow is selected */}
 {formData.propertyType && (
   <div>
@@ -335,8 +355,6 @@ export const ProcurementPage = () => {
     </Select>
   </div>
 )}
-
-
                 
                 <Button
                   type="submit"

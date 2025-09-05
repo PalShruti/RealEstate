@@ -9,7 +9,7 @@ export const HomePage = () => {
   const features = [
     { icon: MapPin, title: "Prime Location", description: "SANE GURUJI VASAHAT, NEAR DESHMUKH HIGH SCHOOL, KOLHAPUR – 416012" },
     { icon: Home, title: "Modern Design", description: "COMTEMPORARY ARCHITECTURE WITH PREMIUM FINISHES AND SPACIOUS LAYOUTS" },
-    { icon: Users, title: "Community Living", description: "VIBERANT COMMUNITY WITH WORLD-CLASS AMENITIES AND GREEN SPACES" }
+    { icon: Users, title: "Community Living", description: "VIBRANT COMMUNITY WITH WORLD-CLASS AMENITIES AND GREEN SPACES" }
   ];
 
   const amenities = [
@@ -76,7 +76,7 @@ export const HomePage = () => {
               Why Choose Our Properties?
             </h2>
             <p className="text-xl text-blue-700 max-w-3xl mx-auto">
-              Discover the perfect blend of luxury, comfort, and convenience
+              Because we provide the perfect blend of luxury, comfort, and convenience
             </p>
           </div>
 
@@ -113,7 +113,7 @@ export const HomePage = () => {
             Ready to Make This Your Home?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Don't miss this opportunity to own your dream home in one of Noida's most prestigious developments
+            Don’t miss the chance to own your dream home in one of the city’s most prestigious communities
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button

@@ -21,6 +21,8 @@ export const AddUnitModal = ({ isOpen, onClose, onSuccess }: AddUnitModalProps) 
     bhk_type: '',
     size_sqft: '',
     price: '',
+
+    
     status: 'Available'
   });
   const [isLoading, setIsLoading] = useState(false);

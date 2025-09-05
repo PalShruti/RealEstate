@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, Eye, Building, MapPin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { unitsService } from "@/services/unitsService";
 import { bungalowsService } from "@/services/bungalowsService";
@@ -13,7 +13,6 @@ import { AddBungalowModal } from "./AddBungalowModal";
 import { EditBungalowModal } from "./EditBungalowModal";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,23 +30,28 @@ interface InventoryPageProps {
 }
 
 export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) => {
-  const [selectedFloorPlan, setSelectedFloorPlan] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // ===== Shared state =====
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  // Units
+  // ===== Units state =====
   const [isAddUnitModalOpen, setIsAddUnitModalOpen] = useState(false);
   const [isEditUnitModalOpen, setIsEditUnitModalOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<any>(null);
 
-  // Bungalows
+  // ===== Bungalows state =====
   const [isAddBungalowModalOpen, setIsAddBungalowModalOpen] = useState(false);
   const [isEditBungalowModalOpen, setIsEditBungalowModalOpen] = useState(false);
   const [selectedBungalow, setSelectedBungalow] = useState<any>(null);
 
-  const { toast } = useToast();
+  // ===== Floor Plan modal state =====
+  const [selectedFloorPlan, setSelectedFloorPlan] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch units
+  // ===== 3D Simulation state =====
+  const [activeView, setActiveView] = useState("exterior");
+
+  // ===== Fetch data =====
   const {
     data: unitsData = [],
     isLoading: isLoadingUnits,
@@ -57,7 +61,6 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
     queryFn: unitsService.getAllUnits,
   });
 
-  // Fetch bungalows
   const {
     data: bungalowsData = [],
     isLoading: isLoadingBungalows,
@@ -67,6 +70,7 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
     queryFn: bungalowsService.getAllBungalows,
   });
 
+  // ===== Helpers =====
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":
@@ -79,10 +83,82 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
-  
 
+  // ===== Floor Plans (from your friend's code) =====
+  const floorPlans = [
+    {
+      title: "Bungalow Plan",
+      size: "",
+      description:
+        "Ground Floor: A premium bungalow layout featuring a wide entrance, grand living area, dining space, modular kitchen, guest bedroom, and a utility zone. Surrounded by landscaped green space for peaceful living.\n\nFirst Floor: Includes a master bedroom with attached bathroom and balcony, two additional bedrooms, a family lounge, and terrace access. Ensures privacy, comfort, and a luxurious lifestyle.",
+      features: [
+        "Wide Entrance",
+        "Grand Living Area",
+        "Modular Kitchen",
+        "Master Bedroom Suite",
+        "Family Lounge",
+        "Terrace Access",
+      ],
+      amenities: [
+        "Landscaped Gardens",
+        "Peaceful Environment",
+        "Privacy & Comfort",
+        "Luxurious Lifestyle",
+        "Multiple Balconies",
+      ],
+      image: "/lovable-uploads/fa99ad8d-34a6-4f7d-a0a0-2e3b1d22b49f.png",
+    },
+    {
+      title: "Flat Plan",
+      size: "",
+      description:
+        "The site plan offers a complete layout overview, including building positions, green zones, jogging tracks, amenity spaces, roads, and open areas. It highlights smart design and excellent internal connectivity.",
+      features: [
+        "Building Positions",
+        "Green Zones",
+        "Jogging Tracks",
+        "Amenity Spaces",
+        "Road Network",
+        "Open Areas",
+      ],
+      amenities: [
+        "Smart Design",
+        "Internal Connectivity",
+        "Green Spaces",
+        "Recreation Areas",
+        "Well-planned Infrastructure",
+      ],
+      image: "/lovable-uploads/3d761c09-4896-4e66-9f40-30bf944237f0.png",
+    },
+    {
+      title: "Site Plan",
+      size: "",
+      description:
+        "Efficient parking design with covered slots, separate visitor parking, designated entry/exit routes, and clearly marked zones. Prioritizes convenience and smooth traffic flow.",
+      features: [
+        "Covered Parking Slots",
+        "Visitor Parking",
+        "Entry/Exit Routes",
+        "Clearly Marked Zones",
+        "Traffic Management",
+      ],
+      amenities: [
+        "Convenience",
+        "Smooth Traffic Flow",
+        "Security",
+        "Easy Access",
+        "Well-organized Layout",
+      ],
+      image: "/lovable-uploads/84c550df-9160-4a7d-835f-868754e1f0aa.png",
+    },
+  ];
 
-  // ✅ FIXED: set row before opening edit modal
+  const views = [
+    { id: "exterior", name: "Exterior View", icon: Building },
+    { id: "surroundings", name: "Nearby Surroundings", icon: MapPin },
+  ];
+
+  // ===== Event handlers =====
   const handleEditUnit = (unit: any) => {
     setSelectedUnit(unit);
     setIsEditUnitModalOpen(true);
@@ -92,20 +168,12 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
     try {
       await unitsService.deleteUnit(unitId);
       refetchUnits();
-      toast({
-        title: "Success",
-        description: `Unit ${unitNumber} deleted successfully!`,
-      });
+      toast({ title: "Success", description: `Unit ${unitNumber} deleted successfully!` });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete unit.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to delete unit.", variant: "destructive" });
     }
   };
 
-  // ✅ FIXED: set row before opening edit modal
   const handleEditBungalow = (bungalow: any) => {
     setSelectedBungalow(bungalow);
     setIsEditBungalowModalOpen(true);
@@ -115,19 +183,18 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
     try {
       await bungalowsService.deleteBungalow(bungalowId);
       refetchBungalows();
-      toast({
-        title: "Success",
-        description: `Bungalow ${plotNumber} deleted successfully!`,
-      });
+      toast({ title: "Success", description: `Bungalow ${plotNumber} deleted successfully!` });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete bungalow.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to delete bungalow.", variant: "destructive" });
     }
   };
 
+  const handleViewDetails = (plan: any) => {
+    setSelectedFloorPlan(plan);
+    setIsModalOpen(true);
+  };
+
+  // ===== Loading state =====
   if (isLoadingUnits || isLoadingBungalows) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -136,21 +203,18 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
     );
   }
 
+  // ===== Render =====
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* ============ Units Table ============ */}
+        {/* ============ Units Table (Floor-wise Availability) ============ */}
         <Card className="mb-12 shadow-xl border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold text-blue-900">
               Floor-wise Unit Availability
             </CardTitle>
             {isAdminLoggedIn && (
-              <Button
-                onClick={() => setIsAddUnitModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
+              <Button onClick={() => setIsAddUnitModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Unit
               </Button>
@@ -177,19 +241,18 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
                       <td className="border px-4 py-3">{unit.unit_number}</td>
                       <td className="border px-4 py-3">{unit.bhk_type}</td>
                       <td className="border px-4 py-3">{unit.size_sqft}</td>
-                      <td className="border px-4 py-3">₹{unit.price.toLocaleString()}</td>
+                      <td className="border px-4 py-3">₹{Number(unit.price).toLocaleString()}</td>
                       <td className="border px-4 py-3">
                         <Badge
-  className={`${getStatusColor(unit.status)} ${unit.status === "Available" ? "cursor-pointer" : ""}`}
-  onClick={() => {
-    if (unit.status === "Available") {
-      navigate('/procurement');
-    }
-  }}
->
-  {unit.status}
-</Badge>
-
+                          className={`${getStatusColor(unit.status)} ${unit.status === "Available" ? "cursor-pointer" : ""}`}
+                          onClick={() => {
+                            if (unit.status === "Available") {
+                              navigate("/procurement#book-visit");
+                            }
+                          }}
+                        >
+                          {unit.status}
+                        </Badge>
                       </td>
                       {isAdminLoggedIn && (
                         <td className="border px-4 py-3">
@@ -223,21 +286,25 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
                       )}
                     </tr>
                   ))}
+                  {unitsData.length === 0 && (
+                    <tr>
+                      <td colSpan={isAdminLoggedIn ? 7 : 6} className="border px-4 py-8 text-center text-blue-600">
+                        No units available. Add some units to get started.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </CardContent>
         </Card>
 
-        {/* ============ Bungalows Table ============ */}
+        {/* ============ Bungalows Table (Bungalow-wise Availability) ============ */}
         <Card className="mb-12 shadow-xl border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold text-blue-900">Bungalow Availability</CardTitle>
             {isAdminLoggedIn && (
-              <Button
-                onClick={() => setIsAddBungalowModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
+              <Button onClick={() => setIsAddBungalowModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Bungalow
               </Button>
@@ -262,19 +329,18 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
                       <td className="border px-4 py-3">{bungalow.plot_number}</td>
                       <td className="border px-4 py-3">{bungalow.type}</td>
                       <td className="border px-4 py-3">{bungalow.size_sqft}</td>
-                      <td className="border px-4 py-3">₹{bungalow.price.toLocaleString()}</td>
+                      <td className="border px-4 py-3">₹{Number(bungalow.price).toLocaleString()}</td>
                       <td className="border px-4 py-3">
                         <Badge
-  className={`${getStatusColor(bungalow.status)} ${bungalow.status === "Available" ? "cursor-pointer" : ""}`}
-  onClick={() => {
-    if (bungalow.status === "Available") {
-      navigate('/procurement');
-    }
-  }}
->
-  {bungalow.status}
-</Badge>
-
+                          className={`${getStatusColor(bungalow.status)} ${bungalow.status === "Available" ? "cursor-pointer" : ""}`}
+                          onClick={() => {
+                            if (bungalow.status === "Available") {
+                              navigate('/procurement');
+                            }
+                          }}
+                        >
+                          {bungalow.status}
+                        </Badge>
                       </td>
                       {isAdminLoggedIn && (
                         <td className="border px-4 py-3">
@@ -308,8 +374,102 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
                       )}
                     </tr>
                   ))}
+                  {bungalowsData.length === 0 && (
+                    <tr>
+                      <td colSpan={isAdminLoggedIn ? 7 : 6} className="border px-4 py-8 text-center text-blue-600">
+                        No bungalows available. Add some bungalows to get started.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ============ Floor Plans Section ============ */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">Floor Plans</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {floorPlans.map((plan, index) => (
+              <Card key={index} className="shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-blue-100">
+                <CardHeader>
+                  <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg overflow-hidden flex items-center justify-center h-[300px]">
+                    {plan.image ? (
+                      <img src={plan.image} alt={plan.title} className="h-full w-auto object-contain" />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full">
+                        <Building className="w-24 h-24 text-blue-600" />
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <h3 className="text-xl font-bold text-blue-900 mb-2">{plan.title}</h3>
+                  <p className="text-blue-700 mb-2">{plan.description.substring(0, 80)}...</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-semibold text-blue-600">{plan.size}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewDetails(plan)}
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* ============ 3D Simulation Section ============ */}
+        <Card className="shadow-xl border-blue-100">
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold text-blue-900 text-center">Property Simulation</CardTitle>
+            <p className="text-center text-blue-700">Explore different views of your future home</p>
+          </CardHeader>
+          <CardContent>
+            {/* Toggle buttons */}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              {views.map((view) => {
+                const Icon = view.icon;
+                return (
+                  <Button
+                    key={view.id}
+                    variant={activeView === view.id ? "default" : "outline"}
+                    onClick={() => setActiveView(view.id)}
+                    className={`flex items-center space-x-2 px-6 py-3 rounded-full transition-all duration-300 ${
+                      activeView === view.id
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : "border-blue-200 text-blue-700 hover:bg-blue-50"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{view.name}</span>
+                  </Button>
+                );
+              })}
+            </div>
+
+            {/* View area */}
+            <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 text-center">
+              {activeView === "exterior" && (
+                <img
+                  src="/lovable-uploads/exterior.jpg" // replace with your actual image path
+                  alt="Exterior View"
+                  className="mx-auto rounded-lg shadow-lg max-h-[500px] object-contain"
+                />
+              )}
+              {activeView === "surroundings" && (
+                <img
+                  src="/lovable-uploads/surroundings.jpg" // replace with your actual image path
+                  alt="Nearby Surroundings"
+                  className="mx-auto rounded-lg shadow-lg max-h-[500px] object-contain"
+                />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -319,14 +479,32 @@ export const InventoryPage = ({ isAdminLoggedIn = false }: InventoryPageProps) =
 
         {isAdminLoggedIn && (
           <>
+            {/* Units modals */}
             <AddUnitModal isOpen={isAddUnitModalOpen} onClose={() => setIsAddUnitModalOpen(false)} onSuccess={refetchUnits} />
-            <EditUnitModal isOpen={isEditUnitModalOpen} onClose={() => setIsEditUnitModalOpen(false)} onSuccess={refetchUnits} unit={selectedUnit} />
+            <EditUnitModal
+              isOpen={isEditUnitModalOpen}
+              onClose={() => setIsEditUnitModalOpen(false)}
+              onSuccess={refetchUnits}
+              unit={selectedUnit}
+            />
 
-            <AddBungalowModal isOpen={isAddBungalowModalOpen} onClose={() => setIsAddBungalowModalOpen(false)} onSuccess={refetchBungalows} />
-            <EditBungalowModal isOpen={isEditBungalowModalOpen} onClose={() => setIsEditBungalowModalOpen(false)} onSuccess={refetchBungalows} bungalow={selectedBungalow} />
+            {/* Bungalows modals */}
+            <AddBungalowModal
+              isOpen={isAddBungalowModalOpen}
+              onClose={() => setIsAddBungalowModalOpen(false)}
+              onSuccess={refetchBungalows}
+            />
+            <EditBungalowModal
+              isOpen={isEditBungalowModalOpen}
+              onClose={() => setIsEditBungalowModalOpen(false)}
+              onSuccess={refetchBungalows}
+              bungalow={selectedBungalow}
+            />
           </>
         )}
       </div>
     </div>
   );
 };
+
+export default InventoryPage;
